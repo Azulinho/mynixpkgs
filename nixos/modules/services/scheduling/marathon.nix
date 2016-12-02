@@ -89,7 +89,7 @@ in {
         ExecStart = "${pkgs.marathon}/bin/marathon --master ${cfg.master} --zk zk://${concatStringsSep "," cfg.zookeeperHosts}/marathon --http_port ${toString cfg.httpPort} ${concatStringsSep " " cfg.extraCmdLineOptions}";
         User = cfg.user;
         Restart = "always";
-        RestartSec = "2";
+        RestartSec = "5";
       };
     };
 

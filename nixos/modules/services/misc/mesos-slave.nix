@@ -108,6 +108,8 @@ in {
       after = [ "network-interfaces.target" ];
       environment.MESOS_CONTAINERIZERS = concatStringsSep "," containerizers;
       serviceConfig = {
+        Restart = "always";
+        RestartSec = 5;
         ExecStart = ''
           ${pkgs.mesos}/bin/mesos-slave \
             --ip=${cfg.ip} \
