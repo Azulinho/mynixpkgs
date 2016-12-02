@@ -315,6 +315,7 @@
   ./services/networking/amuled.nix
   ./services/networking/asterisk.nix
   ./services/networking/atftpd.nix
+  ./services/networking/mesos-dns.nix
   ./services/networking/avahi-daemon.nix
   ./services/networking/bind.nix
   ./services/networking/autossh.nix
