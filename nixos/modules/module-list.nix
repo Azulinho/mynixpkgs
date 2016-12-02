@@ -439,6 +439,7 @@
   ./services/scheduling/cron.nix
   ./services/scheduling/fcron.nix
   ./services/scheduling/marathon.nix
+  ./services/scheduling/marathon-lb.nix
   ./services/search/elasticsearch.nix
   ./services/search/hound.nix
   ./services/search/kibana.nix
