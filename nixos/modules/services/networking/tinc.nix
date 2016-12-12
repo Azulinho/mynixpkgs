@@ -158,6 +158,7 @@ in
           Type = "simple";
           PIDFile = "/run/tinc.${network}.pid";
           Restart = "on-failure";
+          ExecStop = "/etc/tinc/${network}/tinc-down";
         };
         preStart = ''
           mkdir -p /etc/tinc/${network}/hosts
@@ -189,6 +190,7 @@ in
       })
     );
 
+    environment.systemPackages = [ pkgs.avahi ];
   };
 
 }

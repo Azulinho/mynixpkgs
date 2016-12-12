@@ -163,16 +163,23 @@ in
 
     services.avahi.hostName = mkDefault config.networking.hostName;
 
-    users.extraUsers = singleton
-      { name = "avahi";
+    users.extraUsers.avahi = {
         uid = config.ids.uids.avahi;
         description = "`avahi-daemon' privilege separation user";
         home = "/var/empty";
+    };
+    users.extraUsers.avahi-autoipd = {
+        uid = config.ids.uids.avahi-autoipd;
+        description = "`avahi-autoipd' privilege separation user";
+        home = "/var/empty";
+    }; 
+
+    users.extraGroups.avahi = {
+        gid = config.ids.gids.avahi;
       };
 
-    users.extraGroups = singleton
-      { name = "avahi";
-        gid = config.ids.gids.avahi;
+    users.extraGroups.avahi-autoipd = {
+        gid = config.ids.gids.avahi-autoipd;
       };
 
     system.nssModules = optional cfg.nssmdns pkgs.nssmdns;

@@ -518,6 +518,7 @@
       terraria = 253;
       mattermost = 254;
       hound = 259;
+      avahi-autoipd = 260;
 
       # When adding a gid, make sure it doesn't match an existing
       # uid. Users and groups with the same name should have equal

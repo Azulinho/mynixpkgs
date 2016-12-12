@@ -3730,6 +3730,7 @@ in
   tmpwatch = callPackage ../tools/misc/tmpwatch  { };
 
   tmux = callPackage ../tools/misc/tmux { };
+  tmux21 = callPackage ../tools/misc/tmux/tmux21.nix { };
 
   tmux-cssh = callPackage ../tools/misc/tmux-cssh { };
 
