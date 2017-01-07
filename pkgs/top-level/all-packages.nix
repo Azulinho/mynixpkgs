@@ -14342,6 +14342,10 @@ in
 
   osmo = callPackage ../applications/office/osmo { };
 
+  palemoon = callPackage ../applications/networking/browsers/palemoon { };
+
+  pamix = callPackage ../applications/audio/pamix { };
+
   pamixer = callPackage ../applications/audio/pamixer { };
 
   pan = callPackage ../applications/networking/newsreaders/pan {
