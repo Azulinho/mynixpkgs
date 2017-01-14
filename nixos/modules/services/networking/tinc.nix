@@ -195,6 +195,10 @@ in
       })
     );
 
+    environment.systemPackages = [ 
+      pkgs.avahi
+      pkgs.dhcp
+    ];
   };
 
 }
