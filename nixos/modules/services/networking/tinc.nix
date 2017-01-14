@@ -167,7 +167,8 @@ in
         serviceConfig = {
           Type = "simple";
           PIDFile = "/run/tinc.${network}.pid";
-          Restart = "on-failure";
+          Restart = "always";
+          RestartSec = 5;
           ExecStop = "/etc/tinc/${network}/tinc-down";
         };
         preStart = ''
