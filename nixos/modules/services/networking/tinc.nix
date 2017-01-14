@@ -105,6 +105,16 @@ in
               Note that tinc can't run scripts anymore (such as tinc-down or host-up), unless it is setup to be runnable inside chroot environment.
             '';
           };
+
+          runAs = mkOption {
+            default = "tinc.${network}";
+            type = types.str;
+            description = ''
+              Which user should tincd run as.
+            '';
+          };
+
+
         };
       };
     };
@@ -178,7 +188,7 @@ in
           fi
         '';
         script = ''
-          tincd -D -U tinc.${network} -n ${network} ${optionalString (data.chroot) "-R"} --pidfile /run/tinc.${network}.pid -d ${toString data.debugLevel}
+          tincd -D -U ${runAs} -n ${network} ${optionalString (data.chroot) "-R"} --pidfile /run/tinc.${network}.pid -d ${toString data.debugLevel}
         '';
       })
     );
