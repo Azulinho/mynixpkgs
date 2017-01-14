@@ -194,6 +194,23 @@ in
       })
     );
 
+    systemd.services = flip mapAttrs' cfg.networks (network: data: nameValuePair
+      ("iface.tinc.${network}")
+      ({
+        description = "Interface - ${network}";
+        wantedBy = [ "network.target" ];
+        after = [ "tinc.${network}.target" ];
+        path = [ data.package ];
+        restartTriggers = [ config.environment.etc."tinc/${network}/tinc.conf".source ]
+          ++ mapAttrsToList (host: _ : config.environment.etc."tinc/${network}/hosts/${host}".source) data.hosts;
+        serviceConfig = {
+          Type = "oneshot";
+          ExecStop = "/etc/tinc/${network}/tinc-down";
+          ExecStart = "/etc/tinc/${network}/tinc-up";
+        };
+      })
+    );
+
     users.extraUsers = flip mapAttrs' cfg.networks (network: _:
       nameValuePair ("tinc.${network}") ({
         description = "Tinc daemon user for ${network}";
