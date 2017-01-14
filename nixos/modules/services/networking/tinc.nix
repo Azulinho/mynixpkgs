@@ -105,16 +105,6 @@ in
               Note that tinc can't run scripts anymore (such as tinc-down or host-up), unless it is setup to be runnable inside chroot environment.
             '';
           };
-
-          runAs = mkOption {
-            default = null;
-            type = types.nullOr types.str;
-            description = ''
-              Which user should tincd run as.
-            '';
-          };
-
-
         };
       };
     };
@@ -167,8 +157,7 @@ in
         serviceConfig = {
           Type = "simple";
           PIDFile = "/run/tinc.${network}.pid";
-          Restart = "always";
-          RestartSec = 5;
+          Restart = "on-failure";
           ExecStop = "/etc/tinc/${network}/tinc-down";
         };
         preStart = ''
@@ -189,25 +178,8 @@ in
           fi
         '';
         script = ''
-          tincd -D -U ${ if data.runAs == null then "tinc.${network}" else data.runAs} -n ${network} ${optionalString (data.chroot) "-R"} --pidfile /run/tinc.${network}.pid -d ${toString data.debugLevel}
+          tincd -D -U tinc.${network} -n ${network} ${optionalString (data.chroot) "-R"} --pidfile /run/tinc.${network}.pid -d ${toString data.debugLevel}
         '';
-      })
-    );
-
-    systemd.services = flip mapAttrs' cfg.networks (network: data: nameValuePair
-      ("iface.tinc.${network}")
-      ({
-        description = "Interface - ${network}";
-        wantedBy = [ "network.target" ];
-        after = [ "tinc.${network}.target" ];
-        path = [ data.package ];
-        restartTriggers = [ config.environment.etc."tinc/${network}/tinc.conf".source ]
-          ++ mapAttrsToList (host: _ : config.environment.etc."tinc/${network}/hosts/${host}".source) data.hosts;
-        serviceConfig = {
-          Type = "oneshot";
-          ExecStop = "/etc/tinc/${network}/tinc-down";
-          ExecStart = "/etc/tinc/${network}/tinc-up";
-        };
       })
     );
 
