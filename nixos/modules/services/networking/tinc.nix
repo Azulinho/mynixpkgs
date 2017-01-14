@@ -192,6 +192,7 @@ in
       nameValuePair ("tinc.${network}") ({
         description = "Tinc daemon user for ${network}";
         isSystemUser = true;
+        group = "tinc";
       })
     );
 
