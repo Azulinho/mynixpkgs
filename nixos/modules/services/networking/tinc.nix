@@ -107,8 +107,8 @@ in
           };
 
           runAs = mkOption {
-            default = "tinc.${network}";
-            type = types.str;
+            default = null;
+            type = types.nullOr types.str;
             description = ''
               Which user should tincd run as.
             '';
@@ -189,7 +189,7 @@ in
           fi
         '';
         script = ''
-          tincd -D -U ${data.runAs} -n ${network} ${optionalString (data.chroot) "-R"} --pidfile /run/tinc.${network}.pid -d ${toString data.debugLevel}
+          tincd -D -U ${ if data.runAs == null then "tinc.${network}" else data.runAs} -n ${network} ${optionalString (data.chroot) "-R"} --pidfile /run/tinc.${network}.pid -d ${toString data.debugLevel}
         '';
       })
     );
