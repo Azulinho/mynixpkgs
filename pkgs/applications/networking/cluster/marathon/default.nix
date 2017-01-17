@@ -2,11 +2,11 @@
 
 stdenv.mkDerivation rec {
   name = "marathon-${version}";
-  version = "1.1.1";
+  version = "1.1.5";
 
   src = fetchurl {
     url = "https://downloads.mesosphere.com/marathon/v${version}/marathon-${version}.tgz";
-    sha256 = "35a80401383f6551c45c676beed30b3c1af6d3ad027f44735c208abe8eaca93d";
+    sha256 = "5ea832636196cec2f00c9624e7a5032e4603f0d08b6421806a191f34fa278eb3";
   };
 
   buildInputs = [ makeWrapper jdk mesos ];
