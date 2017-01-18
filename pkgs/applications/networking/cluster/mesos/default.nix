@@ -10,7 +10,7 @@ let
   soext = if stdenv.system == "x86_64-darwin" then "dylib" else "so";
 
 in stdenv.mkDerivation rec {
-  version = "0.28.0";
+  version = "0.28.2";
   name = "mesos-${version}";
 
   enableParallelBuilding = false;
@@ -18,7 +18,7 @@ in stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "mirror://apache/mesos/${version}/${name}.tar.gz";
-    sha256 = "05dnj6r5pspizna0fk7yayn38a4w9hlcswgg8l9qmb35m6nq6hby";
+    sha256 = "96f5fc2b4f3879b684a8d5f08ac897a32182535d18fce88c5178e3c243800472";
   };
 
   patches = [
