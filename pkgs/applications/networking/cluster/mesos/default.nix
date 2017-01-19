@@ -14,7 +14,7 @@ in stdenv.mkDerivation rec {
   version = "1.0.1";
   name = "mesos-${version}";
 
-  enableParallelBuilding = false;
+  enableParallelBuilding = true;
   dontDisableStatic = true;
 
   src = fetchurl {
