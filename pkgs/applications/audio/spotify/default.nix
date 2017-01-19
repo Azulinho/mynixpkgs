@@ -3,10 +3,9 @@
 , libgcrypt, systemd, fontconfig, dbus, expat, ffmpeg_0_10, curl, zlib, gnome }:
 
 assert stdenv.system == "x86_64-linux";
-
 let
   # Please update the stable branch!
-  version = "1.0.45.186.g3b5036d6-95";
+  version = "1.0.47.13.gd8e05b1f-47";
 
   deps = [
     alsaLib
@@ -51,7 +50,7 @@ stdenv.mkDerivation {
   src =
     fetchurl {
       url = "http://repository-origin.spotify.com/pool/non-free/s/spotify-client/spotify-client_${version}_amd64.deb";
-      sha256 = "0fpvz1mzyva1sypg4gjmrv0clckb0c3xwjfcxnb8gvkxx9vm56p1";
+      sha256 = "7f32e25aa7188ec74a93d240b994f1126fc034325b66ec6549e7006e05dee900";
     };
 
   buildInputs = [ dpkg makeWrapper ];
