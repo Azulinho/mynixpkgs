@@ -44,7 +44,7 @@ in {
     systemd.services.marathon-lb = {
       description = "marathon-lb Service";
       wantedBy = [ "multi-user.target" ];
-      after = [ "network.target" "zookeeper.service" "mesos-master.service" "mesos-slave.service" "marathon" "docker" ];
+      after = [ "network.target" "zookeeper.service" "mesos-master.service" "mesos-slave.service" "marathon.service" "docker.service" ];
 
       serviceConfig = {
         ExecStart = "${pkgs.docker}/bin/docker run -e PORTS=${ toString cfg.port } --net=host mesosphere/marathon-lb:v1.4.3 ${ concatStringsSep " " cfg.extraCmdLineOptions } ";
