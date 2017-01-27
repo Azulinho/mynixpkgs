@@ -6101,7 +6101,7 @@ in
 
   augeas = callPackage ../tools/system/augeas { };
 
-  ansible = pythonPackages.ansible;
+  ansible = pythonPackages.ansible2;
 
   ansible2 = pythonPackages.ansible2;
 
