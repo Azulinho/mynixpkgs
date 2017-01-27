@@ -63,6 +63,12 @@ in {
         type = types.str;
       };
 
+      mesosUser = mkOption {
+        description = "Which user for running mesos.";
+        default = "root";
+        type = types.str;
+      };
+
       extraCmdLineOptions = mkOption {
         description = ''
           Extra command line options for Mesos Slave.
@@ -126,6 +132,7 @@ in {
       };
       preStart = ''
         mkdir -m 0700 -p ${cfg.workDir}
+        chown ${cfg.mesosUser} ${cfg.workDir}
       '';
     };
   };
