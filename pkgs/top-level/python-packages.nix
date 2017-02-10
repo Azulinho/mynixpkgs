@@ -760,9 +760,71 @@ in modules // {
     };
   };
 
-  ansible  = self.ansible2;
-  ansible2 = self.ansible_2_2;
-  ansible_2_2 = callPackage ../development/python-modules/ansible/2.2.nix {};
+  ansible = buildPythonPackage rec {
+    version = "1.9.6";
+    name = "ansible-${version}";
+    disabled = isPy3k;
+
+    src = pkgs.fetchurl {
+      url = "https://releases.ansible.com/ansible/${name}.tar.gz";
+      sha256 = "0pgfh5z4w44sjgd77q6k769a5ipigjlm28zbpf2jhvz7n60kfxsh";
+    };
+
+    prePatch = ''
+      sed -i "s,/usr/,$out," lib/ansible/constants.py
+    '';
+
+    doCheck = false;
+    dontStrip = true;
+    dontPatchELF = true;
+    dontPatchShebangs = true;
+    windowsSupport = true;
+
+    propagatedBuildInputs = with self; [
+      pycrypto paramiko jinja2 pyyaml httplib2 boto six
+    ] ++ optional windowsSupport pywinrm;
+
+    meta = {
+      homepage = "http://www.ansible.com";
+      description = "A simple automation tool";
+      license = with licenses; [ gpl3] ;
+      maintainers = with maintainers; [ joamaki ];
+      platforms = with platforms; linux ++ darwin;
+    };
+  };
+
+  ansible2 = buildPythonPackage rec {
+    version = "2.2.0.0";
+    name = "ansible-${version}";
+    disabled = isPy3k;
+
+    src = pkgs.fetchurl {
+      url = "http://releases.ansible.com/ansible/${name}.tar.gz";
+      sha256 = "11l5814inr44ammp0sh304rqx2382fr629c0pbwf0k1rjg99iwfr";
+    };
+
+    prePatch = ''
+      sed -i "s,/usr/,$out," lib/ansible/constants.py
+    '';
+
+    doCheck = false;
+    dontStrip = true;
+    dontPatchELF = true;
+    dontPatchShebangs = true;
+    windowsSupport = true;
+
+    propagatedBuildInputs = with self; [
+      pycrypto paramiko jinja2 pyyaml httplib2 boto six readline
+    ] ++ optional windowsSupport pywinrm;
+
+    meta = with stdenv.lib; {
+      homepage = "http://www.ansible.com";
+      description = "A simple automation tool";
+      license = with licenses; [ gpl3 ];
+      maintainers = with maintainers; [ copumpkin ];
+      platforms = with platforms; linux ++ darwin;
+    };
+  };
 
   apipkg = buildPythonPackage rec {
     name = "apipkg-1.4";
