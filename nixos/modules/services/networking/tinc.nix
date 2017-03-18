@@ -162,7 +162,11 @@ in
           Restart = "on-failure";
         };
         preStart = ''
+          # To use AutoConnect = yes, we need to have rw permissions on the
+          # hosts directory.
           mkdir -p /etc/tinc/${network}/hosts
+          chmod 775 /etc/tinc/${network}/hosts
+          chown -R tinc.${network}:tinc.${network} /etc/tinc/${network}/hosts
 
           # Determine how we should generate our keys
           if type tinc >/dev/null 2>&1; then
