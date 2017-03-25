@@ -58,7 +58,7 @@ in {
 
     extraCmdLineOptions = mkOption {
       type = types.listOf types.str;
-      default = [ ];
+      default = [ "--failover_timeout=3600" "--ha" ];
       example = [ "--https_port=8443" "--zk_timeout=10000" "--marathon_store_timeout=2000" ];
       description = ''
 	Extra command line options to pass to Marathon.
