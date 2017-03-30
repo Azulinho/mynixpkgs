@@ -62,7 +62,7 @@ in
 
           mkdir -p /mnt/nix/store
           echo "copying everything (will take a while)..."
-          cp -prd $storePaths /mnt/nix/store/
+          ${pkgs.rsync}/bin/rsync -a $storePaths /mnt/nix/store/
 
           # Register the paths in the Nix database.
           printRegistration=1 perl ${pkgs.pathsFromGraph} /tmp/xchg/closure | \
@@ -111,7 +111,7 @@ in
   # Allow root logins only using the SSH key that the user specified
   # at instance creation time.
   services.openssh.enable = true;
-  services.openssh.permitRootLogin = "without-password";
+  services.openssh.permitRootLogin = "prohibit-password";
   services.openssh.passwordAuthentication = mkDefault false;
 
   # Force getting the hostname from Google Compute.
@@ -125,7 +125,7 @@ in
     169.254.169.254 metadata.google.internal metadata
   '';
 
-  services.ntp.servers = [ "metadata.google.internal" ];
+  networking.timeServers = [ "metadata.google.internal" ];
 
   networking.usePredictableInterfaceNames = false;
 
@@ -134,8 +134,8 @@ in
 
       wantedBy = [ "sshd.service" ];
       before = [ "sshd.service" ];
-      after = [ "network-online.target" "ip-up.target" ];
-      wants = [ "network-online.target" "ip-up.target" ];
+      after = [ "network-online.target" ];
+      wants = [ "network-online.target" ];
 
       script = let wget = "${pkgs.wget}/bin/wget --retry-connrefused -t 15 --waitretry=10 --header='Metadata-Flavor: Google'";
                    mktemp = "mktemp --tmpdir=/run"; in
@@ -261,7 +261,7 @@ in
     "kernel.kptr_restrict" = mkDefault "1";
 
     # set ptrace protections
-    "kernel.yama.ptrace_scope" = mkDefault "1";
+    "kernel.yama.ptrace_scope" = mkOverride 500 "1";
 
     # set perf only available to root
     "kernel.perf_event_paranoid" = mkDefault "2";

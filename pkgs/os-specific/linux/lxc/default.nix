@@ -12,11 +12,11 @@ in
 with stdenv.lib;
 stdenv.mkDerivation rec {
   name = "lxc-${version}";
-  version = "2.0.6";
+  version = "2.0.7";
 
   src = fetchurl {
     url = "https://linuxcontainers.org/downloads/lxc/lxc-${version}.tar.gz";
-    sha256 = "0ynddnfirh9pmy7ijg300jrgzdhjzm07fsmvdw71mb2x0p82qabw";
+    sha256 = "0paz0lgb9dzpgahysad1cr6gz54l6xyhqdx6dzw2kh3fy1sw028w";
   };
 
   nativeBuildInputs = [
@@ -37,6 +37,14 @@ stdenv.mkDerivation rec {
   ];
 
   XML_CATALOG_FILES = "${docbook_xml_dtd_45}/xml/dtd/docbook/catalog.xml";
+
+  # FIXME
+  # glibc 2.25 moved major()/minor() to <sys/sysmacros.h>.
+  # this commit should detect this: https://github.com/lxc/lxc/pull/1388/commits/af6824fce9c9536fbcabef8d5547f6c486f55fdf
+  # However autotools checks if mkdev is still defined in <sys/types.h> runs before
+  # checking if major()/minor() is defined there. The mkdev check succeeds with
+  # a warning and the check which should set MAJOR_IN_SYSMACROS is skipped.
+  NIX_CFLAGS_COMPILE = [ "-DMAJOR_IN_SYSMACROS" ];
 
   configureFlags = [
     "--localstatedir=/var"

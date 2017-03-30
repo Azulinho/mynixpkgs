@@ -116,8 +116,6 @@ in {
       after = [ "network.target" ];
       environment = { ZOOCFGDIR = configDir; };
       serviceConfig = {
-        Restart = "always";
-        RestartSec = 5;
         ExecStart = ''
           ${pkgs.jre}/bin/java \
             -cp "${pkgs.zookeeper}/lib/*:${pkgs.zookeeper}/${pkgs.zookeeper.name}.jar:${configDir}" \

@@ -75,7 +75,8 @@ in
     systemd.services.afsd = {
       description = "AFS client";
       wantedBy = [ "multi-user.target" ];
-      after = [ "network-interfaces.target" ];
+      after = [ "network.target" ];
+      serviceConfig = { RemainAfterExit = true; };
 
       preStart = ''
         mkdir -p -m 0755 /afs

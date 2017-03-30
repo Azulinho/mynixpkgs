@@ -1,6 +1,7 @@
-{ stdenv, lib, pkgArches, fetchurl,
+{ stdenv, lib, pkgArches,
   name, version, src, monos, geckos, platforms,
-  pkgconfig, fontforge, makeWrapper, flex, bison,
+  # flex 2.6.3 causes: undefined reference to `yywrap'
+  pkgconfig, fontforge, makeWrapper, flex_2_6_1, bison,
   supportFlags,
   buildScript ? null, configureFlags ? ""
 }:
@@ -15,17 +16,8 @@ stdenv.mkDerivation ((lib.optionalAttrs (! isNull buildScript) {
 }) // rec {
   inherit name src configureFlags;
 
-  patches = if lib.versionOlder "1.9.0" version then null else [
-    (fetchurl {
-      name = "new-gnutls.patch";
-      url = "http://anonscm.debian.org/git/pkg-wine/wine.git/plain/debian/patches/"
-          + "gnutls.patch?id=758122e8a";
-      sha256 = "1ifpdvdwps1qkzrhnaaaznpj8aww8qpzikhjh04h6rgp2ls0p24j";
-    })
-  ];
-
   nativeBuildInputs = [
-    pkgconfig fontforge makeWrapper flex bison
+    pkgconfig fontforge makeWrapper flex_2_6_1 bison
   ];
 
   buildInputs = toBuildInputs pkgArches (with supportFlags; (pkgs:
@@ -55,8 +47,8 @@ stdenv.mkDerivation ((lib.optionalAttrs (! isNull buildScript) {
   ++ lib.optional pulseaudioSupport      pkgs.libpulseaudio
   ++ lib.optional xineramaSupport        pkgs.xorg.libXinerama
   ++ lib.optionals gstreamerSupport      (with pkgs.gst_all; [ gstreamer gst-plugins-base gst-plugins-good gst-plugins-bad gst-plugins-ugly gst-ffmpeg ])
-  ++ lib.optionals gtkSupport    [ pkgs.gtk3 pkgs.gnome.glib ]
-  ++ lib.optionals openclSupport [ pkgs.opencl-headers pkgs.opencl-icd ]
+  ++ lib.optionals gtkSupport    [ pkgs.gtk3 pkgs.glib ]
+  ++ lib.optionals openclSupport [ pkgs.opencl-headers pkgs.ocl-icd ]
   ++ lib.optionals xmlSupport    [ pkgs.libxml2 pkgs.libxslt ]
   ++ lib.optionals tlsSupport    [ pkgs.openssl pkgs.gnutls ]
   ++ lib.optionals openglSupport [ pkgs.mesa pkgs.mesa_noglu.osmesa pkgs.libdrm ]

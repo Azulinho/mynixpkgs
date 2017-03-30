@@ -13,9 +13,9 @@
 , gdk_pixbuf
 , glib
 , glibc
-, gst_plugins_base
+, gst-plugins-base
 , gstreamer
-, gtk
+, gtk2
 , kerberos
 , libX11
 , libXScrnSaver
@@ -26,7 +26,7 @@
 , libXinerama
 , libXrender
 , libXt
-, libcanberra
+, libcanberra_gtk2
 , libgnome
 , libgnomeui
 , mesa
@@ -63,10 +63,11 @@ let
 
   source = stdenv.lib.findFirst (sourceMatches systemLocale) defaultSource sources;
 
+  name = "thunderbird-bin-${version}";
 in
 
 stdenv.mkDerivation {
-  name = "thunderbird-bin-${version}";
+  inherit name;
 
   src = fetchurl {
     url = "http://download-installer.cdn.mozilla.net/pub/thunderbird/releases/${version}/${source.arch}/${source.locale}/thunderbird-${version}.tar.bz2";
@@ -91,9 +92,9 @@ stdenv.mkDerivation {
       gdk_pixbuf
       glib
       glibc
-      gst_plugins_base
+      gst-plugins-base
       gstreamer
-      gtk
+      gtk2
       kerberos
       libX11
       libXScrnSaver
@@ -104,7 +105,7 @@ stdenv.mkDerivation {
       libXinerama
       libXrender
       libXt
-      libcanberra
+      libcanberra_gtk2
       libgnome
       libgnomeui
       mesa

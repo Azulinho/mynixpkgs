@@ -1,11 +1,11 @@
 { lib, fetchurl, stdenv, zlib, lzo, libtasn1, nettle, pkgconfig, lzip
 , guileBindings, guile, perl, gmp, autogen, libidn, p11_kit, unbound, libiconv
-, tpmSupport ? false, trousers, which, nettools
+, tpmSupport ? false, trousers, which, nettools, libunistring
 
 # Version dependent args
 , version, src, patches ? [], postPatch ? "", nativeBuildInputs ? []
 , buildInputs ? []
-, ...}@args:
+, ...}:
 
 assert guileBindings -> guile != null;
 let
@@ -35,13 +35,9 @@ stdenv.mkDerivation {
   ] ++ lib.optional guileBindings
     [ "--enable-guile" "--with-guile-site-dir=\${out}/share/guile/site" ];
 
-  # Build of the Guile bindings is not parallel-safe.  See
-  # <http://git.savannah.gnu.org/cgit/gnutls.git/commit/?id=330995a920037b6030ec0282b51dde3f8b493cad>
-  # for the actual fix.  Also an apparent race in the generation of
-  # systemkey-args.h.
-  enableParallelBuilding = args.enableParallelBuilding or false;
+  enableParallelBuilding = true;
 
-  buildInputs = [ lzo lzip nettle libtasn1 libidn p11_kit zlib gmp autogen ]
+  buildInputs = [ lzo lzip libtasn1 libidn p11_kit zlib gmp autogen libunistring ]
     ++ lib.optional (stdenv.isFreeBSD || stdenv.isDarwin) libiconv
     ++ lib.optional (tpmSupport && stdenv.isLinux) trousers
     ++ [ unbound ]
@@ -50,6 +46,8 @@ stdenv.mkDerivation {
 
   nativeBuildInputs = [ perl pkgconfig ] ++ nativeBuildInputs
     ++ lib.optionals doCheck [ which nettools ];
+
+  propagatedBuildInputs = [ nettle ];
 
   inherit doCheck;
 

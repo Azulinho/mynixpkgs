@@ -58,7 +58,7 @@ in {
 
     extraCmdLineOptions = mkOption {
       type = types.listOf types.str;
-      default = [ "--failover_timeout=3600" "--ha" ];
+      default = [ ];
       example = [ "--https_port=8443" "--zk_timeout=10000" "--marathon_store_timeout=2000" ];
       description = ''
 	Extra command line options to pass to Marathon.
@@ -89,7 +89,7 @@ in {
         ExecStart = "${pkgs.marathon}/bin/marathon --master ${cfg.master} --zk zk://${concatStringsSep "," cfg.zookeeperHosts}/marathon --http_port ${toString cfg.httpPort} ${concatStringsSep " " cfg.extraCmdLineOptions}";
         User = cfg.user;
         Restart = "always";
-        RestartSec = "5";
+        RestartSec = "2";
       };
     };
 

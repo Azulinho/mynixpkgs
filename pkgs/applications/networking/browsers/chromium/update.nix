@@ -33,7 +33,6 @@ let
     "http://95.31.35.30/chrome/pool/main/g"
     "http://mirror.pcbeta.com/google/chrome/deb/pool/main/g"
     "http://repo.fdzh.org/chrome/deb/pool/main/g"
-    "http://mirror.glendaleacademy.org/chrome/pool/main/g/"
   ];
 
 in rec {
@@ -65,7 +64,7 @@ in rec {
     csv2nix = name: src: import (runCommand "${name}.nix" {
       src = builtins.fetchurl src;
     } ''
-      esc() { echo "\"$(echo "$1" | sed -e 's/"\\$/\\&/')\""; }
+      esc() { echo "\"$(echo "$1" | sed -e 's/"\\$/\\&/')\""; } # ohai emacs "
       IFS=, read -r -a headings <<< "$(head -n1 "$src")"
       echo "[" > "$out"
       tail -n +2 "$src" | while IFS=, read -r -a line; do
@@ -158,9 +157,7 @@ in rec {
           fi
         '';
 
-        impureEnvVars = [
-          "http_proxy" "https_proxy" "ftp_proxy" "all_proxy" "no_proxy"
-        ];
+        impureEnvVars = lib.fetchers.proxyImpureEnvVars;
       };
 
     in {

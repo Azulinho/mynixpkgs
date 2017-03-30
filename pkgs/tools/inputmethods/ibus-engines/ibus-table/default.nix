@@ -1,13 +1,17 @@
-{ stdenv, fetchurl, pkgconfig
-, gtk3, dconf, gobjectIntrospection, ibus, python3, pygobject3 }:
+{ stdenv, fetchFromGitHub
+, autoreconfHook, docbook2x, pkgconfig
+, gtk3, dconf, gobjectIntrospection
+, ibus, python3 }:
 
 stdenv.mkDerivation rec {
   name = "ibus-table-${version}";
-  version = "1.9.11";
+  version = "1.9.14";
 
-  src = fetchurl {
-    url = "https://github.com/kaio/ibus-table/releases/download/${version}/${name}.tar.gz";
-    sha256 = "14sb89z1inbbhcrbsm5nww8la04ncy2lk32mxfqpi4ghl22ixxqd";
+  src = fetchFromGitHub {
+    owner  = "kaio";
+    repo   = "ibus-table";
+    rev    = version;
+    sha256 = "1mkx03iqrq5yq57y7hjqcmxfh41dsjykyyl70d41dflcgp5q2nhw";
   };
 
   postPatch = ''
@@ -25,10 +29,17 @@ stdenv.mkDerivation rec {
   '';
 
   buildInputs = [
-    dconf gtk3 gobjectIntrospection ibus python3 pygobject3
+    dconf gtk3 gobjectIntrospection ibus python3
   ];
 
-  nativeBuildInputs = [ pkgconfig ];
+  nativeBuildInputs = [ autoreconfHook docbook2x pkgconfig python3.pkgs.wrapPython ];
+
+  postUnpack = ''
+    substituteInPlace $sourceRoot/engine/Makefile.am \
+      --replace "docbook2man" "docbook2man --sgml"
+  '';
+
+  postFixup = "wrapPythonPrograms";
 
   meta = with stdenv.lib; {
     isIbusEngine = true;

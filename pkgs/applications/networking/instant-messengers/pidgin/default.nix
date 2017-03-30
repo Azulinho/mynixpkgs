@@ -1,4 +1,4 @@
-{ stdenv, fetchurl, makeWrapper, pkgconfig, gtk, gtkspell, aspell
+{ stdenv, fetchurl, makeWrapper, pkgconfig, gtk2, gtkspell2, aspell
 , gst_all_1, startupnotification, gettext
 , perl, perlXMLParser, libxml2, nss, nspr, farstream, farsight2
 , libXScrnSaver, ncurses, avahi, dbus, dbus_glib, intltool, libidn
@@ -28,7 +28,7 @@ let unwrapped = stdenv.mkDerivation rec {
   NIX_CFLAGS_COMPILE = "-I${gst_all_1.gst-plugins-base.dev}/include/gstreamer-1.0";
 
   buildInputs = [
-    gtkspell aspell startupnotification
+    gtkspell2 aspell startupnotification
     gst_all_1.gstreamer gst_all_1.gst-plugins-base gst_all_1.gst-plugins-good
     libxml2 nss nspr farstream farsight2
     libXScrnSaver ncurses python
@@ -40,7 +40,7 @@ let unwrapped = stdenv.mkDerivation rec {
   ++ (lib.optional (libgcrypt != null) libgcrypt);
 
   propagatedBuildInputs = [
-    pkgconfig gtk perl perlXMLParser gettext
+    pkgconfig gtk2 perl perlXMLParser gettext
   ];
 
   patches = [ ./pidgin-makefile.patch ./add-search-path.patch ];

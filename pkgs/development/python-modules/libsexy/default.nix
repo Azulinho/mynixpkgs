@@ -1,20 +1,19 @@
-{ stdenv, fetchurl, buildPythonPackage, libsexy, pkgconfig, libxml2, pygtk, pango, gtk, glib, }:
+{ stdenv, fetchurl, buildPythonPackage, libsexy, pkgconfig, libxml2, pygtk, pango, gtk2, glib }:
 
-stdenv.mkDerivation rec {
-  name = "python-libsexy-${version}";
+buildPythonPackage rec {
+  name = "libsexy-${version}";
   version = "0.1.9";
+  format = "other";
 
   src = fetchurl {
     url = "http://releases.chipx86.com/libsexy/sexy-python/sexy-python-${version}.tar.gz";
     sha256 = "05bgcsxwkp63rlr8wg6znd46cfbhrzc5wh70jabsi654pxxjb39d";
   };
 
-  buildInputs = [
-    pkgconfig pygtk
-  ];
+  buildInputs = [ pkgconfig ];
 
   propagatedBuildInputs = [
-    libsexy gtk glib pango libxml2
+    pygtk libsexy gtk2 glib pango libxml2
   ];
 
   postInstall = ''

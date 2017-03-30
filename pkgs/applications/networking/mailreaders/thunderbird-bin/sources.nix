@@ -1,8 +1,3 @@
-# This file is generated from generate_sources.rb. DO NOT EDIT.
-# Execute the following command to update the file.
-#
-# ruby generate_sources.rb 45.1.1 > sources.nix
-
 {
   version = "45.8.0";
   sources = [
