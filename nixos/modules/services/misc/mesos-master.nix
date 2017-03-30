@@ -113,7 +113,8 @@ in {
             --logging_level=${cfg.logLevel} \
             ${toString cfg.extraCmdLineOptions}
         '';
-        Restart = "on-failure";
+        Restart = "always";
+        RestartSec = 5;
         PermissionsStartOnly = true;
       };
       preStart = ''

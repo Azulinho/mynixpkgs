@@ -12,6 +12,8 @@ let
   attribsArg = optionalString (cfg.attributes != {})
                               "--attributes=${mkAttributes cfg.attributes}";
 
+  containerizers = [ "mesos" ] ++ (optional cfg.withDocker "docker");
+
   containerizersArg = concatStringsSep "," (
     lib.unique (
       cfg.containerizers ++ (optional cfg.withDocker "docker")
@@ -136,6 +138,12 @@ in {
         type = types.str;
       };
 
+      mesosUser = mkOption {
+        description = "Which user for running mesos.";
+        default = "root";
+        type = types.str;
+      };
+
       extraCmdLineOptions = mkOption {
         description = ''
           Extra command line options for Mesos Slave.
@@ -188,8 +196,11 @@ in {
       description = "Mesos Slave";
       wantedBy = [ "multi-user.target" ];
       after = [ "network.target" ];
+      environment.MESOS_CONTAINERIZERS = concatStringsSep "," containerizers;
       path = [ pkgs.stdenv.shellPackage ];
       serviceConfig = {
+        Restart = "always";
+        RestartSec = 5;
         ExecStart = ''
           ${pkgs.mesos}/bin/mesos-slave \
             --containerizers=${containerizersArg} \
@@ -214,6 +225,7 @@ in {
       };
       preStart = ''
         mkdir -m 0700 -p ${cfg.workDir}
+        chown ${cfg.mesosUser} ${cfg.workDir}
       '';
     };
   };
