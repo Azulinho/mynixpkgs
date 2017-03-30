@@ -7,6 +7,10 @@ let
 
   cfg = config.services.avahi;
 
+  # We must escape interfaces due to the systemd interpretation
+  subsystemDevice = interface:
+    "sys-subsystem-net-devices-${utils.escapeSystemdPath interface}.device";
+
   avahiDaemonConf = with cfg; pkgs.writeText "avahi-daemon.conf" ''
     [server]
     ${# Users can set `networking.hostName' to the empty string, when getting
@@ -159,36 +163,40 @@ in
 
     services.avahi.hostName = mkDefault config.networking.hostName;
 
-    users.extraUsers = singleton
-      { name = "avahi";
+    users.extraUsers.avahi = {
         uid = config.ids.uids.avahi;
         description = "`avahi-daemon' privilege separation user";
         home = "/var/empty";
+    };
+    users.extraUsers.avahi-autoipd = {
+        uid = config.ids.uids.avahi-autoipd;
+        description = "`avahi-autoipd' privilege separation user";
+        home = "/var/empty";
+    }; 
+
+    users.extraGroups.avahi = {
+        gid = config.ids.gids.avahi;
       };
 
-    users.extraGroups = singleton
-      { name = "avahi";
-        gid = config.ids.gids.avahi;
+    users.extraGroups.avahi-autoipd = {
+        gid = config.ids.gids.avahi-autoipd;
       };
 
     system.nssModules = optional cfg.nssmdns pkgs.nssmdns;
 
     environment.systemPackages = [ pkgs.avahi ];
 
-    systemd.sockets.avahi-daemon =
-      { description = "Avahi mDNS/DNS-SD Stack Activation Socket";
-        listenStreams = [ "/var/run/avahi-daemon/socket" ];
-        wantedBy = [ "sockets.target" ];
-      };
-
     systemd.services.avahi-daemon =
-      { description = "Avahi mDNS/DNS-SD Stack";
-        wantedBy = [ "multi-user.target" ];
-        requires = [ "avahi-daemon.socket" ];
-
-        serviceConfig."NotifyAccess" = "main";
-        serviceConfig."BusName" = "org.freedesktop.Avahi";
-        serviceConfig."Type" = "dbus";
+      let
+        deps = optionals (cfg.interfaces!=null) (map subsystemDevice cfg.interfaces);
+      in
+      { description = "Avahi daemon";
+        wantedBy = [ "ip-up.target" ];
+        bindsTo = deps;
+        after = deps;
+        before = [ "ip-up.target" ];
+        # Receive restart event after resume
+        partOf = [ "post-resume.target" ];
 
         path = [ pkgs.coreutils pkgs.avahi ];
 

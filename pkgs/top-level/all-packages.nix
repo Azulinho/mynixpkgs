@@ -4086,6 +4086,8 @@ with pkgs;
 
   tmux = callPackage ../tools/misc/tmux { };
 
+  tmux21 = callPackage ../tools/misc/tmux/tmux21.nix { }; 
+
   tmux-cssh = callPackage ../tools/misc/tmux-cssh { };
 
   tmuxp = callPackage ../tools/misc/tmuxp { };

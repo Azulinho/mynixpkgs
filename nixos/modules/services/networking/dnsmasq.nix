@@ -97,6 +97,8 @@ in
           dnsmasq --test
         '';
         serviceConfig = {
+          Restart = "always";
+          RestartSec = 5;
           Type = "dbus";
           BusName = "uk.org.thekelleys.dnsmasq";
           ExecStart = "${dnsmasq}/bin/dnsmasq -k --enable-dbus --user=dnsmasq -C ${dnsmasqConf}";
