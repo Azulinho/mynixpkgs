@@ -1,11 +1,11 @@
 { lib, fetchurl, stdenv, zlib, lzo, libtasn1, nettle, pkgconfig, lzip
 , guileBindings, guile, perl, gmp, autogen, libidn, p11_kit, unbound, libiconv
-, tpmSupport ? false, trousers, nettools, bash
+, tpmSupport ? false, trousers, which, nettools
 
 # Version dependent args
 , version, src, patches ? [], postPatch ? "", nativeBuildInputs ? []
 , buildInputs ? []
-, ...}:
+, ...}@args:
 
 assert guileBindings -> guile != null;
 let
@@ -39,17 +39,17 @@ stdenv.mkDerivation {
   # <http://git.savannah.gnu.org/cgit/gnutls.git/commit/?id=330995a920037b6030ec0282b51dde3f8b493cad>
   # for the actual fix.  Also an apparent race in the generation of
   # systemkey-args.h.
-  enableParallelBuilding = false;
+  enableParallelBuilding = args.enableParallelBuilding or false;
 
   buildInputs = [ lzo lzip nettle libtasn1 libidn p11_kit zlib gmp autogen ]
-    ++ lib.optional doCheck nettools
     ++ lib.optional (stdenv.isFreeBSD || stdenv.isDarwin) libiconv
     ++ lib.optional (tpmSupport && stdenv.isLinux) trousers
     ++ [ unbound ]
     ++ lib.optional guileBindings guile
     ++ buildInputs;
 
-  nativeBuildInputs = [ perl pkgconfig ] ++ nativeBuildInputs;
+  nativeBuildInputs = [ perl pkgconfig ] ++ nativeBuildInputs
+    ++ lib.optionals doCheck [ which nettools ];
 
   inherit doCheck;
 
@@ -60,6 +60,10 @@ stdenv.mkDerivation {
         -e 's,-L${gmp.dev}/lib,-L${gmp.out}/lib,' \
         -e 's,-lgmp,-L${gmp.out}/lib -lgmp,' \
         -i $out/lib/*.la "$dev/lib/pkgconfig/gnutls.pc"
+  '' + ''
+    # It seems only useful for static linking but basically noone does that.
+    substituteInPlace "$out/lib/libgnutls.la" \
+      --replace "-lunistring" ""
   '';
 
   meta = with lib; {
