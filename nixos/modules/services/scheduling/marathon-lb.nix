@@ -47,7 +47,7 @@ in {
       after = [ "network.target" "zookeeper.service" "mesos-master.service" "mesos-slave.service" "marathon.service" "docker.service" ];
 
       serviceConfig = {
-        ExecStart = "${pkgs.docker}/bin/docker run -e PORTS=${ toString cfg.port } --net=host mesosphere/marathon-lb:v1.4.3 ${ concatStringsSep " " cfg.extraCmdLineOptions } ";
+        ExecStart = "${pkgs.docker}/bin/docker run -e PORTS=${ toString cfg.port } --net=host --privileged -v /dev/log:/dev/log mesosphere/marathon-lb:v1.4.3 ${ concatStringsSep " " cfg.extraCmdLineOptions } ";
         Restart = "always";
         RestartSec = "5";
       };
