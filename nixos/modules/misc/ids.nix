@@ -547,6 +547,7 @@
       #rpc = 271; # unused
       #geoip = 272; # unused
       fcron = 273;
+      avahi-autoipd = 399;
 
       # When adding a gid, make sure it doesn't match an existing
       # uid. Users and groups with the same name should have equal
