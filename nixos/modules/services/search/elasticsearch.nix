@@ -138,6 +138,7 @@ in {
         ExecStart = "${cfg.package}/bin/elasticsearch -Des.path.conf=${configDir} ${toString cfg.extraCmdLineOptions}";
         User = "elasticsearch";
         PermissionsStartOnly = true;
+        LimitNOFILE=65536;
       };
       preStart = ''
         mkdir -m 0700 -p ${cfg.dataDir}
@@ -147,7 +148,6 @@ in {
         ln -sfT ${cfg.package}/lib ${cfg.dataDir}/lib
         ln -sfT ${cfg.package}/modules ${cfg.dataDir}/modules
         if [ "$(id -u)" = 0 ]; then chown -R elasticsearch ${cfg.dataDir}; fi
-        ulimit -n 8192
       '';
       postStart = mkBefore ''
         until ${pkgs.curl.bin}/bin/curl -s -o /dev/null ${cfg.listenAddress}:${toString cfg.port}; do
