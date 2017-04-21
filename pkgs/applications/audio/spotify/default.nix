@@ -59,14 +59,16 @@ stdenv.mkDerivation {
 
   buildInputs = [ dpkg makeWrapper ];
 
+  doConfigure = false;
+  doBuild = false;
+  dontStrip = true;
+  dontPatchELF = true;
+
   unpackPhase = ''
     runHook preUnpack
     dpkg-deb -x $src .
     runHook postUnpack
   '';
-
-  configurePhase = "runHook preConfigure; runHook postConfigure";
-  buildPhase = "runHook preBuild; runHook postBuild";
 
   installPhase =
     ''
@@ -110,13 +112,11 @@ stdenv.mkDerivation {
       runHook postInstall
     '';
 
-  dontStrip = true;
-  dontPatchELF = true;
-
-  meta = {
+  meta = with stdenv.lib; {
     homepage = https://www.spotify.com/;
     description = "Play music from the Spotify music service";
-    license = stdenv.lib.licenses.unfree;
-    maintainers = with stdenv.lib.maintainers; [ eelco ftrvxmtrx sheenobu mudri ];
+    license = licenses.unfree;
+    maintainers = with maintainers; [ eelco ftrvxmtrx sheenobu mudri ];
+    platforms = [ "x86_64-linux" ];
   };
 }
