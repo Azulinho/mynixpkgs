@@ -12,7 +12,7 @@ stdenv.mkDerivation rec {
 
   src = fetchurl {
     url = "http://www.syntevo.com/static/smart/download/smartgit/smartgit-linux-${version}.tar.gz";
-    sha256 = "1ghxjg5dm22kwfrq26nqp4qhh6h7f4l4fnf1cx9cksd30ypwy223";
+    sha256 = "10knz4jxvrjm5akyw2p9a4k9sv8nzc83dk96jp822v02y9y06rsx";
   };
 
   nativeBuildInputs = [ makeWrapper ];
