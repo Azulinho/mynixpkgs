@@ -183,7 +183,7 @@ in {
           The environment variables that should be passed to the executor, and thus subsequently task(s).
         '';
         default = {
-          PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
+          PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/run/current-system/sw/bin/";
         };
         type = types.attrsOf types.str;
       };
