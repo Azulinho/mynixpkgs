@@ -226,6 +226,8 @@ in {
       preStart = ''
         mkdir -m 0700 -p ${cfg.workDir}
         chown ${cfg.mesosUser} ${cfg.workDir}
+        # make sure mesos-slave on restart won't overwrite the boot_id
+        test -e ${cfg.workDir}/meta/boot_id && chmod +i ${cfg.workDir}/meta/boot_id
       '';
     };
   };
