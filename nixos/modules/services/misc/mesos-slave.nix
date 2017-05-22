@@ -224,6 +224,8 @@ in {
         PermissionsStartOnly = true;
       };
       preStart = ''
+        PATH=$PATH:/run/current-system/sw/bin
+        export PATH
         mkdir -m 0700 -p ${cfg.workDir}
         chown ${cfg.mesosUser} ${cfg.workDir}
         # make sure mesos-slave on restart won't overwrite the boot_id
