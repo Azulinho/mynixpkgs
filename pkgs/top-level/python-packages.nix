@@ -118,6 +118,8 @@ in {
     };
   };
 
+  phonenumbers = callPackage ../development/python-modules/phonenumbers { };
+
   agate-dbf = buildPythonPackage rec {
     name = "agate-dbf-0.1.0";
     disabled = isPy3k;
@@ -1003,6 +1005,7 @@ in {
 
   ansible_2_1 = callPackage ../development/python-modules/ansible/2.1.nix {};
   ansible_2_2 = callPackage ../development/python-modules/ansible/2.2.nix {};
+  ansible_2_3 = lowPrio (callPackage ../development/python-modules/ansible/2.3.nix {});
 
   apipkg = buildPythonPackage rec {
     name = "apipkg-1.4";
@@ -4426,11 +4429,11 @@ in {
       sha256 = "01h3lrf6d98j07iakifi81qjszh6faa37ibx7ylva1vsqbwx2hgi";
     };
 
-    # On i686-linux and Python 2.x this test fails because the result is "3L"
-    # instead of "3", so let's fix it in-place.
+    # With Python 2.x on i686-linux or 32-bit ARM this test fails because the
+    # result is "3L" instead of "3", so let's fix it in-place.
     #
     # Upstream issue: https://github.com/cython/cython/issues/1548
-    postPatch = optionalString (stdenv.isi686 && !isPy3k) ''
+    postPatch = optionalString ((stdenv.isi686 || stdenv.isArm) && !isPy3k) ''
       sed -i -e 's/\(>>> *\)\(verify_resolution_GH1533()\)/\1int(\2)/' \
         tests/run/cpdef_enums.pyx
     '';
@@ -15312,25 +15315,25 @@ in {
     };
   };
 
-  pygraphviz = buildPythonPackage rec {
-    name = "pygraphviz-${version}";
-    version = "1.4rc1";
+  graphviz = buildPythonPackage rec {
+    name = "graphviz-${version}";
+    version = "0.5.2";
 
     src = pkgs.fetchurl {
-      url = "mirror://pypi/p/pygraphviz/${name}.tar.gz";
-      sha256 = "00ck696rddjnrwfnh1zw87b9xzqfm6sqjy6kqf6kmn1xwsi6f19a";
+      url = "mirror://pypi/g/graphviz/${name}.zip";
+      sha256 = "0jh31nlm0qbxwylhdkwnb69pcjlc5z03fcfbs0gvgzp3hfrngsk0";
     };
 
-    buildInputs = with self; [ doctest-ignore-unicode mock nose ];
-    propagatedBuildInputs = [ pkgs.graphviz pkgs.pkgconfig ];
+    propagatedBuildInputs = [ pkgs.graphviz ];
 
     meta = {
-      description = "Python interface to Graphviz graph drawing package";
-      homepage = https://github.com/pygraphviz/pygraphviz;
-      license = licenses.bsd3;
-      maintainers = with maintainers; [ matthiasbeyer ];
+      description = "Simple Python interface for Graphviz";
+      homepage = https://github.com/xflr6/graphviz;
+      license = licenses.mit;
     };
   };
+
+  pygraphviz = callPackage ../development/python-modules/pygraphviz { };
 
   pympler = buildPythonPackage rec {
     pname = "Pympler";
@@ -15560,12 +15563,12 @@ in {
   };
 
   nbxmpp = buildPythonPackage rec {
-    name = "nbxmpp-0.5.3";
+    name = "nbxmpp-${version}";
+    version = "0.5.5";
 
     src = pkgs.fetchurl {
-      name = "${name}.tar.gz";
-      url = "https://python-nbxmpp.gajim.org/downloads/8";
-      sha256 = "0dcr786dyips1fdvgsn8yvpgcz5j7217fi05c29cfypdl8jnp6mp";
+      url = "mirror://pypi/n/nbxmpp/${name}.tar.gz";
+      sha256 = "1gnzrzrdl4nii1sc5x8p5iw2ya5sl70j3nn34abqsny51p2pzmv6";
     };
 
     meta = {
@@ -21471,6 +21474,10 @@ in {
       sed -i 's/test_set_default_verify_paths/noop/' tests/test_ssl.py
     '';
 
+    # 20170626: Disable tests until the hardcoded certificates in the
+    # test sources are updated. This stopped working around June 10-11 2017.
+    doCheck = false;
+
     checkPhase = ''
       runHook preCheck
       export LANG="en_US.UTF-8";
@@ -24613,6 +24620,7 @@ in {
     };
     LC_ALL = "en_US.UTF-8";
     buildInputs = with self; [ pytest simplejson mock pkgs.glibcLocales html5lib ] ++ optional (pythonOlder "3.4") self.enum34;
+    doCheck = !stdenv.isDarwin;
     # Disable two tests that require network access.
     checkPhase = ''
       cd tests; ${python.interpreter} run.py --ignore py35 -k 'not test_defaults and not test_anchors_ignored'

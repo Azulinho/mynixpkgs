@@ -68,6 +68,13 @@ in rec {
       inherit (bootPkgs) hscolour;
       sphinx = pkgs.python27Packages.sphinx;
     };
+    ghc821 = callPackage ../development/compilers/ghc/8.2.1.nix rec {
+      bootPkgs = packages.ghc802;
+      inherit (bootPkgs) hscolour alex happy;
+      inherit buildPlatform targetPlatform;
+      sphinx = pkgs.python3Packages.sphinx;
+      selfPkgs = packages.ghc821;
+    };
     ghcHEAD = callPackage ../development/compilers/ghc/head.nix rec {
       bootPkgs = packages.ghc7103;
       inherit (bootPkgs) alex happy;
@@ -79,6 +86,10 @@ in rec {
     };
     ghcjsHEAD = packages.ghc802.callPackage ../development/compilers/ghcjs/head.nix {
       bootPkgs = packages.ghc802;
+    };
+    ghcHaLVM240 = callPackage ../development/compilers/halvm/2.4.0.nix rec {
+      bootPkgs = packages.ghc802;
+      inherit (bootPkgs) hscolour alex happy;
     };
 
     jhc = callPackage ../development/compilers/jhc {
@@ -101,6 +112,7 @@ in rec {
       in pkgs.recurseIntoAttrs (integerSimpleGhcs // {
            ghcHEAD = integerSimpleGhcs.ghcHEAD.override { selfPkgs = packages.integer-simple.ghcHEAD; };
          });
+
   };
 
   packages = {
@@ -151,6 +163,10 @@ in rec {
       ghc = compiler.ghc802;
       compilerConfig = callPackage ../development/haskell-modules/configuration-ghc-8.0.x.nix { };
     };
+    ghc821 = callPackage ../development/haskell-modules {
+      ghc = compiler.ghc821;
+      compilerConfig = callPackage ../development/haskell-modules/configuration-ghc-8.2.x.nix { };
+    };
     ghcHEAD = callPackage ../development/haskell-modules {
       ghc = compiler.ghcHEAD;
       compilerConfig = callPackage ../development/haskell-modules/configuration-ghc-head.nix { };
@@ -160,13 +176,23 @@ in rec {
       ghc = compiler.ghcHEAD.crossCompiler;
       compilerConfig = callPackage ../development/haskell-modules/configuration-ghc-head.nix { };
     };
+    ghcCross821 = callPackage ../development/haskell-modules {
+      ghc = compiler.ghc821.crossCompiler;
+      compilerConfig = callPackage ../development/haskell-modules/configuration-ghc-8.2.x.nix { };
+    };
     ghcjs = callPackage ../development/haskell-modules {
       ghc = compiler.ghcjs;
-      compilerConfig = callPackage ../development/haskell-modules/configuration-ghcjs.nix { };
+      compilerConfig = callPackage ../development/haskell-modules/configuration-ghc-7.10.x.nix { };
+      packageSetConfig = callPackage ../development/haskell-modules/configuration-ghcjs.nix { };
     };
     ghcjsHEAD = callPackage ../development/haskell-modules {
       ghc = compiler.ghcjsHEAD;
-      compilerConfig = callPackage ../development/haskell-modules/configuration-ghcjs.nix { };
+      compilerConfig = callPackage ../development/haskell-modules/configuration-ghc-8.0.x.nix { };
+      packageSetConfig = callPackage ../development/haskell-modules/configuration-ghcjs.nix { };
+    };
+    ghcHaLVM240 = callPackage ../development/haskell-modules {
+      ghc = compiler.ghcHaLVM240;
+      compilerConfig = callPackage ../development/haskell-modules/configuration-halvm-2.4.0.nix { };
     };
 
     # The integer-simple attribute set contains package sets for all the GHC compilers

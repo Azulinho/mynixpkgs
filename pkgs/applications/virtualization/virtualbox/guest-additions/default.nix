@@ -62,6 +62,9 @@ stdenv.mkDerivation {
     for i in *
     do
         cd $i
+        # Files within the guest additions ISO are using DOS line endings
+        sed -re '/^(@@|---|\+\+\+)/!s/$/\r/' ${../linux-4.12.patch} \
+          | patch -d vboxguest -p4
         find . -type f | xargs sed 's/depmod -a/true/' -i
         make
         cd ..
@@ -97,7 +100,7 @@ stdenv.mkDerivation {
     sed -i -e "s|/usr/bin|$out/bin|" bin/VBoxClient-all
 
     # Install binaries
-    install -D -m 4755 lib/VBoxGuestAdditions/mount.vboxsf $out/bin/mount.vboxsf
+    install -D -m 755 lib/VBoxGuestAdditions/mount.vboxsf $out/bin/mount.vboxsf
     install -D -m 755 sbin/VBoxService $out/bin/VBoxService
 
     mkdir -p $out/bin

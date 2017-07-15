@@ -62,15 +62,15 @@ let
   };
 in releaseTools.nixBuild rec {
   name = "hydra-${version}";
-  version = "2017-03-21";
+  version = "2017-06-22";
 
   inherit stdenv;
 
   src = fetchFromGitHub {
     owner = "NixOS";
     repo = "hydra";
-    rev = "57bc0eaead8c76ffd71ddc49adfacc47bb8a75ac";
-    sha256 = "1kshl6ms42fgh621s1ba3a224rawqzgvl89rq1k6c9qhlplpndd9";
+    rev = "803833aba77e1082c14857aa26933fc7fe5ae190";
+    sha256 = "1cnxpsan8l6fnbr73n0qxxq1szlda1n3qfkk9k9ic8ijk7md4pvs";
   };
 
   buildInputs =
@@ -104,7 +104,7 @@ in releaseTools.nixBuild rec {
 
   configureFlags = [ "--with-docbook-xsl=${docbook_xsl}/xml/xsl/docbook" ];
 
-  preHook = ''
+  shellHook = ''
     PATH=$(pwd)/src/script:$(pwd)/src/hydra-eval-jobs:$(pwd)/src/hydra-queue-runner:$(pwd)/src/hydra-evaluator:$PATH
     PERL5LIB=$(pwd)/src/lib:$PERL5LIB;
   '';

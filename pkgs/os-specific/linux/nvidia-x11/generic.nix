@@ -8,7 +8,7 @@
 , preferGtk2 ? false
 }:
 
-{ stdenv, callPackage, callPackage_i686, buildEnv, fetchurl
+{ stdenv, callPackage, callPackage_i686, buildEnv, fetchurl, fetchpatch
 , kernel ? null, xorg, zlib, perl, nukeReferences
 , # Whether to build the libraries only (i.e. not the kernel module or
   # nvidia-settings).  Used to support 32-bit binaries on 64-bit
@@ -32,15 +32,34 @@ let
     src =
       if stdenv.system == "i686-linux" then
         fetchurl {
-          url = "http://download.nvidia.com/XFree86/Linux-x86/${version}/NVIDIA-Linux-x86-${version}${pkgSuffix}.run";
+          url = "https://download.nvidia.com/XFree86/Linux-x86/${version}/NVIDIA-Linux-x86-${version}${pkgSuffix}.run";
           sha256 = sha256_32bit;
         }
       else if stdenv.system == "x86_64-linux" then
         fetchurl {
-          url = "http://download.nvidia.com/XFree86/Linux-x86_64/${version}/NVIDIA-Linux-x86_64-${version}${pkgSuffix}.run";
+          url = "https://download.nvidia.com/XFree86/Linux-x86_64/${version}/NVIDIA-Linux-x86_64-${version}${pkgSuffix}.run";
           sha256 = sha256_64bit;
         }
       else throw "nvidia-x11 does not support platform ${stdenv.system}";
+
+    prePatch = let
+      debPatches = fetchurl {
+        url = "mirror://debian/pool/non-free/n/nvidia-graphics-drivers-legacy-304xx/"
+            + "nvidia-graphics-drivers-legacy-304xx_304.135-2.debian.tar.xz";
+        sha256 = "0mhji0ssn7075q5a650idigs48kzf11pzj2ca2n07rwxg3vj6pdr";
+      };
+      prefix = "debian/module/debian/patches";
+      applyPatches = pnames: if pnames == [] then null else
+        ''
+          tar xf '${debPatches}'
+          sed 's|^\([+-]\{3\} [ab]\)/|\1/kernel/|' -i ${prefix}/*.patch
+          patches="$patches ${concatMapStringsSep " " (pname: "${prefix}/${pname}.patch") pnames}"
+        '';
+    in
+      # TODO: perhaps other branches also need patching?
+      if (versionOlder version "340") then applyPatches
+        [ "fix-typos" "drm-driver-legacy" "deprecated-cpu-events" "disable-mtrr" ]
+      else null;
 
     # patch to get the nvidia and nvidiaBeta driver to compile on kernel 4.10
     patches = if libsOnly
@@ -49,17 +68,16 @@ let
               then null
               else if versionOlder version "375"
               then [
-                     (fetchurl {
-                         url = https://git.archlinux.org/svntogit/packages.git/plain/trunk/4.10.0_kernel.patch?h=packages/nvidia-340xx;
-                         sha256 = "08k2phr9kawg6a3v88d4zkj7gdlih29gm5a1gmhpgmvd926k0z5l";
+                     (fetchpatch {
+                        name = "kernel-4.10.patch";
+                        url = https://git.archlinux.org/svntogit/packages.git/plain/nvidia-340xx/trunk/4.10.0_kernel.patch?id=53fb1df89;
+                        sha256 = "171hb57m968qdjcr3h8ppfzhrchf573f39rdja86a1qq1gmrv7pa";
                      })
                          # from https://git.archlinux.org/svntogit/packages.git/plain/trunk/fs52243.patch?h=packages/nvidia-340xx
                          # with datestamps removed
                      ./fs52243.patch
                    ]
-              else [ (fetchurl {
-                      url = https://git.archlinux.org/svntogit/packages.git/plain/trunk/kernel_4.10.patch?h=packages/nvidia;  sha256 = "0zhpx3baq2pca2pmz1af5cp2nzjxjx0j9w5xrdy204mnv3v2708z";
-                     }) ];
+              else null;
 
     inherit version useGLVND useProfiles;
     inherit (stdenv) system;

@@ -99,11 +99,13 @@ rec {
     sha256 = "00b1rqgd4yr206dxp4mcymr56ymbjcjfa4m82pxw73khj032qw3j";
   };
 
-  grsecurity_testing = grsecPatch
-    { kver   = "4.9.23";
-      grrev  = "201704181901";
-      sha512 = "1cwiqrr707iz6rv72ikj6h3r6r5x325qlq21gsacsxslvk8igmj97amnqylsg32bjj0za072cb8lqf0zvrv7xzvlc9zjcwridd79vc2";
-    };
+  grsecurity_testing = throw ''
+    Upstream has ceased free support for grsecurity/PaX.
+
+    See https://grsecurity.net/passing_the_baton.php
+    and https://grsecurity.net/passing_the_baton_faq.php
+    for more information.
+  '';
 
   # This patch relaxes grsec constraints on the location of usermode helpers,
   # e.g., modprobe, to allow calling into the Nix store.
