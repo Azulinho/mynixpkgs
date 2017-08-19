@@ -1,6 +1,5 @@
 { stdenv, fetchurl, fetchpatch, dpkg, curl, libarchive, openssl, ruby, buildRubyGem, libiconv
-, libxml2, libxslt, libffi, makeWrapper, p7zip, sqlite, xar, gzip, cpio }:
-
+, libxml2, libxslt, makeWrapper, p7zip, xar, gzip, cpio }:
 
 let
   version = "1.9.1";
@@ -57,7 +56,7 @@ in stdenv.mkDerivation rec {
 
       # move unpacked directories to match unpacked .deb from linux,
       # so installPhase can be shared
-      mkdir -p opt/vagrant/ usr/ usr/lib/ usr/include/
+      mkdir -p opt/vagrant/ usr/
       mv embedded opt/vagrant/embedded
       mv bin usr/bin
     '';
@@ -115,20 +114,10 @@ in stdenv.mkDerivation rec {
     ln -s ${libxslt.dev}/bin/xslt-config opt/vagrant/embedded/bin
     ln -s ${libxslt.bin}/bin/xsltproc opt/vagrant/embedded/bin
 
-    # sqlite3
-    rm -f usr/lib/libsqlite3.so
-    rm -f usr/include/libsqlite3.h
-    mkdir -p usr/lib
-    mkdir -p usr/include
-    ln -s ${sqlite.out}/lib/libsqlite3.so usr/lib/libsqlite3.so
-    ln -s ${sqlite.dev}/include/libsqlite3.h usr/include/libsqlite3.h
-
-
-
     mkdir -p "$out"
     cp -r opt "$out"
     cp -r usr/bin "$out"
-    wrapProgram "$out/bin/vagrant" --prefix LD_LIBRARY_PATH : "${stdenv.lib.makeLibraryPath [ libxml2 libxslt sqlite ]}" \
+    wrapProgram "$out/bin/vagrant" --prefix LD_LIBRARY_PATH : "${stdenv.lib.makeLibraryPath [ libxml2 libxslt ]}" \
                                    --prefix LD_LIBRARY_PATH : "$out/opt/vagrant/embedded/lib"
   '';
 
